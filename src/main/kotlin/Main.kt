@@ -1,5 +1,7 @@
+import kotlin.math.abs
+
 fun main(args: Array<String>) {
-    val lines = object {}.javaClass.getResourceAsStream("input.txt")?.bufferedReader()?.readLines()
+    val lines = object {}.javaClass.getResourceAsStream(args[0])?.bufferedReader()?.readLines()
     val lefts = lines?.map { it.split("  ")[0] } ?: emptyList()
     val rights = lines?.map { it.split("  ")[1] } ?: emptyList()
 
@@ -7,6 +9,6 @@ fun main(args: Array<String>) {
     val rigthOrdered = rights.sorted()
 
    println(leftOrdered.zip(rigthOrdered).map { (left, right) ->
-        Math.abs(left.toFloat() - right.toFloat())
+        abs(left.toFloat() - right.toFloat())
     }.sum())
 }
