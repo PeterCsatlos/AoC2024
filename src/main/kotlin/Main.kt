@@ -1,7 +1,12 @@
 fun main(args: Array<String>) {
-    println("Hello World!")
+    val lines = object {}.javaClass.getResourceAsStream("input.txt")?.bufferedReader()?.readLines()
+    val lefts = lines?.map { it.split("  ")[0] } ?: emptyList()
+    val rights = lines?.map { it.split("  ")[1] } ?: emptyList()
 
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
+    val leftOrdered = lefts.sorted()
+    val rigthOrdered = rights.sorted()
+
+   println(leftOrdered.zip(rigthOrdered).map { (left, right) ->
+        Math.abs(left.toFloat() - right.toFloat())
+    }.sum())
 }
