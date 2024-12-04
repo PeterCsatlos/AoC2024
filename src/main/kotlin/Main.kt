@@ -1,7 +1,40 @@
 fun main(args: Array<String>) {
-    println("Hello World!")
+    val lines = object {}.javaClass.getResourceAsStream("input.txt")?.bufferedReader()?.readLines() ?: emptyList()
 
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
+    val matrix = Array(lines.size) { rowindex -> lines[rowindex].toCharArray() }
+
+    var xmasCount = 0
+
+    for ((i,row) in matrix.withIndex()) {
+        for ((j, column) in row.withIndex()) {
+            if (column == 'X') {
+                for (istep in -1..1) {
+                    for (jstep in -1..1) {
+                        var iLeap = i + istep
+                        var jLeap = j + jstep
+                        if (indexesCheck(iLeap, matrix, jLeap, row) && matrix[iLeap][jLeap] == 'M') {
+                            iLeap = iLeap + istep
+                            jLeap = jLeap + jstep
+                            if( indexesCheck(iLeap, matrix, jLeap, row) && matrix[iLeap][jLeap] == 'A') {
+                                iLeap = iLeap + istep
+                                jLeap = jLeap + jstep
+                                if(indexesCheck(iLeap, matrix, jLeap, row) && matrix[iLeap][jLeap] == 'S') {
+                                    xmasCount++
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    println(xmasCount)
 }
+
+private fun indexesCheck(
+    i: Int,
+    matrix: Array<CharArray>,
+    j: Int,
+    row: CharArray
+) = i >= 0 && i  < matrix.size && j >= 0 && j < row.size
