@@ -11,49 +11,42 @@ fun main(args: Array<String>) {
     }
 
     var movement = matrix[index.first][index.second]
-    while (index.first >= 0 && index.first <= matrix.size-1 && index.second >= 0 && index.second <= matrix[0].size-1) {
+    while (index.first > 0 && index.first < matrix.size - 1 && index.second > 0 && index.second < matrix[0].size - 1) {
         matrix[index.first][index.second] = 'X'
         if (movement == '^') {
-            if (index.first == 0) {
-                index = Pair(-1, -1)
+
+            if (matrix[index.first - 1][index.second] == '#') {
+                movement = '>'
             } else {
-                if (matrix[index.first - 1][index.second] == '#') {
-                    movement = '>'
-                } else {
-                    index = Pair(index.first - 1, index.second)
-                }
+                index = Pair(index.first - 1, index.second)
             }
+
         } else if (movement == '>') {
-            if (index.second == matrix[0].size-1) {
-                index = Pair(-1, matrix[0].size + 1)
+            if (matrix[index.first][index.second + 1] == '#') {
+                movement = 'v'
             } else {
-                if (matrix[index.first][index.second + 1] == '#') {
-                    movement = 'v'
-                } else {
-                    index = Pair(index.first, index.second + 1)
-                }
+                index = Pair(index.first, index.second + 1)
             }
+
         } else if (movement == 'v') {
-            if (index.first == matrix.size-1) {
-                index = Pair(matrix.size + 1, matrix[0].size + 1)
+
+            if (matrix[index.first + 1][index.second] == '#') {
+                movement = '<'
             } else {
-                if (matrix[index.first + 1][index.second] == '#') {
-                    movement = '<'
-                } else {
-                    index = Pair(index.first + 1, index.second)
-                }
+                index = Pair(index.first + 1, index.second)
             }
+
         } else if (movement == '<') {
-            if (index.second == 0) {
-                index = Pair(-1, -1)
-            } else {
+
             if (matrix[index.first][index.second - 1] == '#') {
                 movement = '^'
             } else {
                 index = Pair(index.first, index.second - 1)
-            }}
+            }
+
         }
     }
+    matrix[index.first][index.second] = 'X'
 
     var count = 0
 
