@@ -11,18 +11,60 @@ fun main(args: Array<String>) {
     }
 
     var movement = matrix[index.first][index.second]
-    while (index.first > 0 && index.first < matrix.size - 1 && index.second > 0 && index.second < matrix[0].size - 1) {
-        matrix[index.first][index.second] = 'X'
-        if (movement == '^') {
+    var count = 0
+    matrix.forEachIndexed { lineIndex, line ->
+        line.forEachIndexed { charIndex, char ->
+            if (char != '^' &&
+                char != '>' &&
+                char != '<' &&
+                char != 'v' &&
+                char != '#') {
+                matrix[lineIndex][charIndex] = '#'
+                val stuck = simulateMovement(index, matrix, movement)
+                matrix[lineIndex][charIndex] = '.'
+                if (stuck) {
+                    count++
+                    println(count)
+                }
+            }
+        }
+    }
 
+    println(count)
+}
+
+private fun simulateMovement(
+    initialIndex: Pair<Int, Int>,
+    initialMatrix: Array<CharArray>,
+    initialMovement: Char
+): Boolean {
+    var index = initialIndex
+    var movement = initialMovement
+    var stuck = false
+    val matrix = deepCopyMatrix(initialMatrix)
+    val crossMatrix = createCrossMatrix(initialMatrix)
+    crossMatrix[initialIndex.first][initialIndex.second] = "."
+    while (index.first > 0 && index.first < matrix.size - 1 && index.second > 0 && index.second < matrix[0].size - 1 && !stuck) {
+
+
+        // make move
+        //stuck = makeMove(matrix, index, crossMatrix, movement, stuck)
+        if (crossMatrix[index.first][index.second].contains(movement)) {
+            return true
+        }
+
+        if (movement == '^') {
             if (matrix[index.first - 1][index.second] == '#') {
+                crossMatrix[index.first][index.second] = crossMatrix[index.first][index.second] + "^"
                 movement = '>'
             } else {
                 index = Pair(index.first - 1, index.second)
             }
 
         } else if (movement == '>') {
-            if (matrix[index.first][index.second + 1] == '#') {
+            if (matrix[index.first][index.second + 1] == '#')
+            {
+                crossMatrix[index.first][index.second] = crossMatrix[index.first][index.second] + ">"
                 movement = 'v'
             } else {
                 index = Pair(index.first, index.second + 1)
@@ -31,14 +73,15 @@ fun main(args: Array<String>) {
         } else if (movement == 'v') {
 
             if (matrix[index.first + 1][index.second] == '#') {
+                crossMatrix[index.first][index.second] = crossMatrix[index.first][index.second] + "v"
                 movement = '<'
             } else {
                 index = Pair(index.first + 1, index.second)
             }
 
         } else if (movement == '<') {
-
             if (matrix[index.first][index.second - 1] == '#') {
+                crossMatrix[index.first][index.second] = crossMatrix[index.first][index.second] + "<"
                 movement = '^'
             } else {
                 index = Pair(index.first, index.second - 1)
@@ -46,13 +89,17 @@ fun main(args: Array<String>) {
 
         }
     }
-    matrix[index.first][index.second] = 'X'
+    return stuck
+}
 
-    var count = 0
-
-    matrix.forEach { line ->
-        count += line.count { char -> char == 'X' }
+fun deepCopyMatrix(matrix: Array<CharArray>): Array<CharArray> {
+    return Array(matrix.size) { rowIndex ->
+        matrix[rowIndex].copyOf()
     }
+}
 
-    println(count)
+fun createCrossMatrix(matrix: Array<CharArray>): Array<MutableList<String>> {
+    return Array(matrix.size) { rowIndex ->
+        matrix[rowIndex].copyOf().map { it.toString() }.toMutableList()
+    }
 }
