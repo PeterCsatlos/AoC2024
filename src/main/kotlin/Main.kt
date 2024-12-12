@@ -6,7 +6,7 @@ fun main(args: Array<String>) {
     }.toTypedArray()
 
     // coordinates of the reached nines
-    val reachedNines: HashSet<Pair<Int,Int>> = HashSet()
+    var reachedNines: MutableList<Pair<Int,Int>> = mutableListOf()
 
     val zeros = mutableListOf<Pair<Int, Int>>()
     for (rowIndex in matrix.indices) {
@@ -20,14 +20,14 @@ fun main(args: Array<String>) {
     zeros.forEach {(zeroX,zeroY) ->
         recursive(zeroX, zeroY, 0, matrix, reachedNines)
         result+= reachedNines.size
-        reachedNines.removeAll(reachedNines)
+        reachedNines = mutableListOf()
     }
 
     println(result)
 
 }
 
-fun recursive(x: Int, y: Int, goal: Int, matrix: Array<IntArray>, reached: HashSet<Pair<Int,Int>>) {
+fun recursive(x: Int, y: Int, goal: Int, matrix: Array<IntArray>, reached: MutableList<Pair<Int,Int>>) {
     if(x<0 || y<0 || x== matrix.size || y==matrix[0].size) {
         println("Out of bounds")
         return
