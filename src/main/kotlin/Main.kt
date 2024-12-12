@@ -1,48 +1,80 @@
+import java.util.*
+
 fun main(args: Array<String>) {
     val lines = object {}.javaClass.getResourceAsStream("input.txt")?.bufferedReader()?.readLines() ?: emptyList()
 
-    val blocks = mutableListOf<String>()
-    var isFile = true
-    var index = 0
-    lines[0].forEach {
-        val current = it.toString().toInt()
-        if (isFile) {
-            for (i in 0..<current) {
-                blocks.add(index.toString())
-            }
-            index++
-        } else {
-            for (i in 0 ..<current) {
-                blocks.add(".")
-            }
-        }
-        isFile = !isFile
-    }
-    val emptyIndexes = mutableListOf<Int>()
-    blocks.forEachIndexed { charIndex, char ->
-        if(char== ".") {
-            emptyIndexes.add(charIndex)
-        }
-    }
+    // index to how big is the file, what is the content
+    val files = TreeMap<Int,Pair<Int,Int>>()
+    // index of the empty spaces where they start and for how long
+    val emptyIndexes = TreeMap<Int, Int>()
+    fillFilesAndEmptyIndexes(lines, files, emptyIndexes)
+    val resultFiles = TreeMap(files)
+    var filesIndex = files.size-1
+    var emptyIndex = 0
+    var found = false
 
-    var end = blocks.size-1
-    while (emptyIndexes.size > 0) {
-        if (blocks.elementAt(end) == ".") {
-            emptyIndexes.removeLast()
-            end--
-        } else {
-            blocks[emptyIndexes[0]] = blocks.elementAt(end)
-            blocks[end] = "."
-            end--
-            emptyIndexes.removeAt(0)
+    while (filesIndex > 0) {
+        val file = files.entries.elementAt(filesIndex)
+        //should be earlier then the file we are checking
+        while (emptyIndex < emptyIndexes.size && emptyIndex < filesIndex && !found) {
+            val empty = emptyIndexes.entries.elementAt(emptyIndex)
+            if (empty.key > file.key ) {
+                found = true
+            } else if (empty.value >= file.value.first) {
+                resultFiles.remove(file.key)
+                resultFiles[empty.key] = Pair(file.value.first, file.value.second)
+                val emptySpaceLeft = empty.value - file.value.first
+                emptyIndexes[empty.key] = emptySpaceLeft
+                if (emptySpaceLeft == 0) {
+                    emptyIndexes.remove(empty.key)
+                } else {
+                    emptyIndexes[empty.key+file.value.first] = emptyIndexes[empty.key]!!
+                    emptyIndexes.remove(empty.key)
+                }
+                found = true
+            }
+            emptyIndex++
         }
+        found = false
+        emptyIndex = 0
+        filesIndex--
     }
 
     var result = 0.toLong()
-    index = 0
-    while (index<= end) {
-        result += blocks[index].toInt() * index
-        index++
+    resultFiles.forEach { entry ->
+        val startIndex = entry.key
+        val length = entry.value.first
+        val value = entry.value.second
+        for (i in 0..<length) {
+            result += (startIndex + i) * value
+        }
     }
     println(result)
+}
+
+private fun fillFilesAndEmptyIndexes(
+    lines: List<String>,
+    files: TreeMap<Int, Pair<Int, Int>>,
+    emptyIndexes: TreeMap<Int, Int>
+): Int {
+    var isFile = true
+    var index = 0
+    var fileNumber = 0
+    lines[0].forEach { char ->
+        val charAsInt = char.toString().toInt()
+        if (isFile) {
+            if (charAsInt != 0) {
+                files[index] = Pair(charAsInt, fileNumber)
+            }
+            isFile = false
+            fileNumber++
+        } else {
+            if (charAsInt != 0) {
+                emptyIndexes[index] = charAsInt
+            }
+            isFile = true
+        }
+        index += char.toString().toInt()
+    }
+    return index
 }
