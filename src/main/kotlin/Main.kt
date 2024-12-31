@@ -11,38 +11,32 @@ fun main(args: Array<String>) {
         robots.add(Robot(x = pos.first, y = pos.second, speed = speed))
     }
 
-    robots.forEach{
-        for (i in 0..<100) {
+    var i = 0
+    do {
+        robots.forEach{
             it.move()
-            println(i)
         }
-    }
+        i++
+    } while (robots.map { Pair(it.x, it.y)}.toSet().size != robots.size)
 
-    val xHalf = X_MAX/2
-    val yHalf = Y_MAX/2
-
-    var first = 0L
-    var second = 0L
-    var third = 0L
-    var fourth = 0L
-
-    robots.forEach {
-        if (it.x < xHalf && it.y < yHalf) {
-            first++
-        } else if (it.x > xHalf && it.y > yHalf) {
-            fourth ++
-        } else if (it.x < xHalf && it.y > yHalf) {
-            third ++
-        } else if (it.x > xHalf && it.y < yHalf) {
-            second++
-        }
-    }
-
-    println(first*second*third*fourth)
+    robots.print()
+    println(i)
 }
 
 private const val X_MAX = 101
 private const val Y_MAX = 103
+
+fun List<Robot>.print() {
+    val charArray = Array(X_MAX) { CharArray(Y_MAX) { '.' } }
+
+    this.forEach { robot ->
+        charArray[robot.x][robot.y] = '0'
+    }
+
+    charArray.forEach { row ->
+        println(row.joinToString(""))
+    }
+}
 
 class Robot(
     var x: Int,
